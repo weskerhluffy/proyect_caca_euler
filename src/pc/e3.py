@@ -16,7 +16,7 @@ from cmath import exp, pi, acos
 from ctypes import c_int
 import re
 from collections import defaultdict
-from functools import partial, reduce
+from functools import partial, reduce, lru_cache
 from fractions import gcd
 
 
@@ -651,7 +651,7 @@ def pce_genera_putos(n):
     d = ceil(n ** (1 / 4))
     return list(range(1, d + 1))
 
-
+@lru_cache(maxsize=10000)
 def pce_is_prime(number):
     if number > 1:
         if number == 2:
@@ -683,7 +683,7 @@ def pce_core(n):
     n_orig=n
     raiz=n**(0.5)
     primos=pce_generador_primos(n)
-    logger_cagada.debug("n es {} raoz {}".format(n,raiz))
+    #logger_cagada.debug("n es {} raoz {}".format(n,raiz))
     while not(n&1) and n:
         n>>=1
         #logger_cagada.debug("shit n es {}".format(n))
@@ -691,13 +691,13 @@ def pce_core(n):
         return 2
     mayor_factor=0
     for primo in primos:
-        logger_cagada.debug("en primo {} n es {}".format(primo,n))
-        if primo>raiz+1:
+        #logger_cagada.debug("en primo {} n es {}".format(primo,n))
+        if primo>n:
             break
         while not(n%primo):
             mayor_factor=primo
             n//=primo
-        logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
+        #logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
         if n==1:
             break
     return mayor_factor if mayor_factor else n

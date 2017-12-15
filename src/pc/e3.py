@@ -683,21 +683,21 @@ def pce_core(n):
     n_orig=n
     raiz=n**(0.5)
     primos=pce_generador_primos(n)
-    #logger_cagada.debug("n es {} raoz {}".format(n,raiz))
+    logger_cagada.debug("n es {} raoz {}".format(n,raiz))
     while not(n&1) and n:
         n>>=1
         #logger_cagada.debug("shit n es {}".format(n))
-    if (not n):
+    if (n==1):
         return 2
     mayor_factor=0
     for primo in primos:
-        #logger_cagada.debug("en primo {} n es {}".format(primo,n))
+        logger_cagada.debug("en primo {} n es {}".format(primo,n))
         if primo>raiz+1:
             break
         while not(n%primo):
             mayor_factor=primo
             n//=primo
-        #logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
+        logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
         if n==1:
             break
     return mayor_factor if mayor_factor else n

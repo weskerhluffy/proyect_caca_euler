@@ -5,6 +5,7 @@ Created on 08/10/2017
 @author: ernesto
 '''
 # XXX: https://www.hackerrank.com/contests/projecteuler/challenges/euler003
+# XXX: http://web.maths.unsw.edu.au/~davidharvey/talks/factoring.pdf
 
 from math import log, ceil
 import sys
@@ -18,9 +19,10 @@ from collections import defaultdict
 from functools import partial, reduce
 from fractions import gcd
 
+
 nivel_log = logging.ERROR
 nivel_log = logging.DEBUG
-logger_cagada = None
+#logger_cagada = None
 
 def modular(n, m):
     if(m):
@@ -48,7 +50,7 @@ class enterote():
     dos_pi = 4 * acos(0)
     @classmethod
     def ffft_int(clazz, com_in, com_in_inicio, com_out, com_out_inicio, pasito, tam, direccion, exps):    
-#        #logger_cagada.debug("l idx in ini {} l idx out ini {} el pasito {} el tam {}".format(com_in_inicio,com_out_inicio, pasito, tam))
+#        ##logger_cagada.debug("l idx in ini {} l idx out ini {} el pasito {} el tam {}".format(com_in_inicio,com_out_inicio, pasito, tam))
         if tam == 1:
             com_out[com_out_inicio] = com_in[com_in_inicio]
             return
@@ -56,24 +58,24 @@ class enterote():
         pasito_doble = pasito << 1
         enterote.ffft_int(com_in, com_in_inicio, com_out, com_out_inicio, pasito_doble, tam_mitad, direccion, exps)
         enterote.ffft_int(com_in, com_in_inicio + pasito, com_out, com_out_inicio + tam_mitad, pasito_doble, tam_mitad, direccion, exps)
-#        #logger_cagada.debug("la salida {} el pasito {} el tam {}".format(com_out, pasito, tam))
+#        ##logger_cagada.debug("la salida {} el pasito {} el tam {}".format(com_out, pasito, tam))
         for i in range(tam_mitad):
             idx_out_par = i + com_out_inicio
             idx_out_impar = idx_out_par + tam_mitad
-#            #logger_cagada.debug("idx out {} com ini {} tam mitad {}".format(idx_out,com_out_inicio,tam_mitad))
+#            ##logger_cagada.debug("idx out {} com ini {} tam mitad {}".format(idx_out,com_out_inicio,tam_mitad))
             com_par = com_out[idx_out_par]
             com_impar = com_out[idx_out_impar]
             exp1 = exps[i][tam]
             factor_caca = exp1 * com_impar
 #            exp1tmp=exp(direccion*enterote.dos_pi*i*1j/tam)
 #            assert exp1==exp1tmp, "el exp cache {} el otro {}".format(exp1,exp1tmp)
-#            #logger_cagada.debug("el exp1 {} para meirda {} {} ".format(exp1, i,tam))
-#            #logger_cagada.debug("el exp2 {} para meirda {}".format(exp2, i+tam_mitad))
+#            ##logger_cagada.debug("el exp1 {} para meirda {} {} ".format(exp1, i,tam))
+#            ##logger_cagada.debug("el exp2 {} para meirda {}".format(exp2, i+tam_mitad))
             
             com_out[idx_out_par] = com_par + factor_caca
             com_out[idx_out_impar] = com_par - factor_caca
-#            #logger_cagada.debug("calculando {} + {} * {} = {} en {}".format(com_par,exp1,com_impar,com_out[idx_out],idx_out))
-#            #logger_cagada.debug("calculando {} - {} * {} = {} en {}".format(com_par,exp1,com_impar,com_out[idx_out+tam_mitad],idx_out+tam_mitad))
+#            ##logger_cagada.debug("calculando {} + {} * {} = {} en {}".format(com_par,exp1,com_impar,com_out[idx_out],idx_out))
+#            ##logger_cagada.debug("calculando {} - {} * {} = {} en {}".format(com_par,exp1,com_impar,com_out[idx_out+tam_mitad],idx_out+tam_mitad))
 
     @classmethod
     def iffft(clazz, com_in, com_out):    
@@ -132,7 +134,7 @@ class enterote():
         if(tam_normalizado <= self.digitos_tam):
             return
         self.digitos += [0] * (tam_normalizado - self.digitos_tam)
-#        #logger_cagada.debug("normalizado de {} a {}".format(self.digitos_tam, tam_normalizado))
+#        ##logger_cagada.debug("normalizado de {} a {}".format(self.digitos_tam, tam_normalizado))
         self.digitos_tam = tam_normalizado
     
     @classmethod
@@ -153,30 +155,30 @@ class enterote():
     def __mul__(self, otro):
         assert self.base == otro.base
         enterote.normalizar_para_fft(self, otro)
-#        #logger_cagada.debug("ent 1 normalizado a {}".format(self.digitos))
-#        #logger_cagada.debug("ent 2 normalizado a {}".format(otro.digitos))
+#        ##logger_cagada.debug("ent 1 normalizado a {}".format(self.digitos))
+#        ##logger_cagada.debug("ent 2 normalizado a {}".format(otro.digitos))
         ent1_t = [0j] * len(self.digitos)
         ent2_t = [0j] * len(self.digitos)
-        # logger_cagada.debug("ent1 redondeado {}".format(ent1_t))
-        # logger_cagada.debug("ent2 redondeado {}".format(ent2_t))
+        # #logger_cagada.debug("ent1 redondeado {}".format(ent1_t))
+        # #logger_cagada.debug("ent2 redondeado {}".format(ent2_t))
         enterote.ffft(self.digitos, ent1_t)
-#        #logger_cagada.debug("la trans 1 {}".format(ent1_t))
+#        ##logger_cagada.debug("la trans 1 {}".format(ent1_t))
     # print("etn1 t {}".format(ent1_t))
         enterote.ffft(otro.digitos, ent2_t)
-#        #logger_cagada.debug("la trans 2 {}".format(ent2_t))
+#        ##logger_cagada.debug("la trans 2 {}".format(ent2_t))
         entr_t = list(map(mul, ent1_t, ent2_t))
-        # logger_cagada.debug("etnr t {}".format(entr_t))
+        # #logger_cagada.debug("etnr t {}".format(entr_t))
         entr_t_r = [0j] * len(entr_t)
         enterote.iffft(entr_t, entr_t_r)
         entr_tmp = enterote.parte_real_redondeada_de_complejos(entr_t_r)
-        # logger_cagada.debug("resultado bryto {}".format(entr_tmp))
+        # #logger_cagada.debug("resultado bryto {}".format(entr_tmp))
         entr = entr_tmp[:]
-        # logger_cagada.debug("resultado tmp {}".format(entr_tmp))
+        # #logger_cagada.debug("resultado tmp {}".format(entr_tmp))
         for idx in range(len(entr) - 1):
             coef = entr[idx]
             entr[idx] = coef % self.base
             entr[idx + 1] += coef // self.base
-        # logger_cagada.debug("resultado ya arregladito {}".format(entr))
+        # #logger_cagada.debug("resultado ya arregladito {}".format(entr))
         return enterote(entr, self.base)
         
     def __repr__(self):
@@ -231,19 +233,19 @@ class poligamio_positivo():
     @classmethod 
     def numero_a_digitos(clazz, num, base):
         digitos = []
-        # logger_cagada.debug("convirtiendo num {}".format(num))
+        # #logger_cagada.debug("convirtiendo num {}".format(num))
         while num:
             digitos.append(num % base)
             num //= base
-        # logger_cagada.debug("kedo en digitos {}".format(digitos))
+        # #logger_cagada.debug("kedo en digitos {}".format(digitos))
         return digitos
     
     @classmethod
     def numero_a_digitos_padeado(clazz, num, base, pad):
         digitos = poligamio_positivo.numero_a_digitos(num, base)
-        # logger_cagada.debug("el num {} kedo en digitos {} ".format(num, digitos))
+        # #logger_cagada.debug("el num {} kedo en digitos {} ".format(num, digitos))
         digitos += [0] * (pad - len(digitos))
-        # logger_cagada.debug(" padeado a {} kedo {}".format(pad, digitos))
+        # #logger_cagada.debug(" padeado a {} kedo {}".format(pad, digitos))
         return digitos
     
     @classmethod
@@ -252,7 +254,7 @@ class poligamio_positivo():
         pol = poligamio.coeficientes
         for coef in pol:
             digitos += poligamio_positivo.numero_a_digitos_padeado(coef, base, pad)
-        # logger_cagada.debug("el polinomio {} kedo como digitos {}".format(poligamio, digitos))
+        # #logger_cagada.debug("el polinomio {} kedo como digitos {}".format(poligamio, digitos))
         return enterote(digitos, base)
     
     @classmethod
@@ -275,7 +277,7 @@ class poligamio_positivo():
         for i in range(0, len(ent.digitos), exp):
             digitos = ent.digitos[i:i + exp]
             coefs.append(poligamio_positivo.digitos_a_numero(digitos, base, modulo))
-        # logger_cagada.debug("el entero {} se paso a coefs {} de base {}".format(ent, coefs, base))
+        # #logger_cagada.debug("el entero {} se paso a coefs {} de base {}".format(ent, coefs, base))
         return poligamio_positivo(coefs, base, modulo)
         
     
@@ -283,27 +285,28 @@ class poligamio_positivo():
     def __mul__(self, other):
         assert self.base == other.base
         assert self.modulo == other.modulo
+        assert self.base is not None
         base = self.base
         modulo = self.modulo
         max_exp = max(self.max_exp, other.max_exp)
         max_coef = max(self.max_coef, other.max_coef)
         max_coef_esperado = max_exp * max_coef ** 2
         exp_10, pot_10 = poligamio_positivo.determina_pot_exp_min_base(max_coef_esperado, base)
-        # logger_cagada.debug("de pol {} y {} el exp base {} es {} para maximo coef sperado {}".format(self, other, base, exp_10,hex(max_coef_esperado)))
+        # #logger_cagada.debug("de pol {} y {} el exp base {} es {} para maximo coef sperado {}".format(self, other, base, exp_10,hex(max_coef_esperado)))
         
         ent1 = poligamio_positivo.enterote_de_poligamio_positivo(self, base, exp_10)
         ent2 = poligamio_positivo.enterote_de_poligamio_positivo(other, base, exp_10)
         
-        # logger_cagada.debug("el polinom 1 {} kedo como ent {}".format(self, ent1))
-        # logger_cagada.debug("el polinom 2 {} kedo como ent {}".format(other, ent2))
-        # logger_cagada.debug("el ent1 tam {}".format(len(ent1.digitos)))
-        # logger_cagada.debug("el ent2 tam {}".format(len(ent2.digitos)))
+        # #logger_cagada.debug("el polinom 1 {} kedo como ent {}".format(self, ent1))
+        # #logger_cagada.debug("el polinom 2 {} kedo como ent {}".format(other, ent2))
+        # #logger_cagada.debug("el ent1 tam {}".format(len(ent1.digitos)))
+        # #logger_cagada.debug("el ent2 tam {}".format(len(ent2.digitos)))
         
         entr = ent1 * ent2
         
         pol = poligamio_positivo.poligamio_positivo_de_enterote(entr, base, exp_10, modulo)
         
-        # logger_cagada.debug("la mult de pol {} y {} resulta {}".format(self, other, pol))
+        # #logger_cagada.debug("la mult de pol {} y {} resulta {}".format(self, other, pol))
         
         return pol
     
@@ -362,7 +365,7 @@ class poligamio():
                 coeficientes_positivos[idx] = coef
         self.polinomio_positivo = poligamio_positivo(coeficientes_positivos, self.base, self.modulo)
         self.polinomio_negativo = poligamio_positivo(coeficientes_negativos, self.base, self.modulo)
-#        #logger_cagada.debug("los coefs {} el pol p {} n {}".format(self.coeficientes, self.polinomio_positivo, self.polinomio_negativo))
+#        ##logger_cagada.debug("los coefs {} el pol p {} n {}".format(self.coeficientes, self.polinomio_positivo, self.polinomio_negativo))
     
     @classmethod
     def quita_sobrantes_coeficientes(cls, coeficientes):
@@ -377,9 +380,9 @@ class poligamio():
     # profile
     def __mul__(self, orto):
         polr = self.polinomio_positivo * orto.polinomio_positivo + self.polinomio_negativo * orto.polinomio_negativo
-        # logger_cagada.debug("el polr solo pos {}".format(polr))
+        # #logger_cagada.debug("el polr solo pos {}".format(polr))
         polr -= (self.polinomio_positivo * orto.polinomio_negativo + self.polinomio_negativo * orto.polinomio_positivo)
-        # logger_cagada.debug("el polr final {}".format(polr))
+        # #logger_cagada.debug("el polr final {}".format(polr))
         return poligamio(polr.coeficientes, self.base, self.modulo)
     
     __rmul__ = __mul__
@@ -414,7 +417,7 @@ class poligamio():
         assert self.base == orto.base
         assert self.modulo == orto.modulo
         modular_mod = self.modular_mod
-        logger_cagada.debug("dividendo {} divisor {}".format(self, orto,))
+        #logger_cagada.debug("dividendo {} divisor {}".format(self, orto,))
     
 #    enterote.normalizar_a_tam(N,max_exp)
 #    enterote.normalizar_a_tam(D,max_exp)
@@ -423,8 +426,8 @@ class poligamio():
         dD = len(D) - 1
         if(orto.es_divisor_sintetico()):
             return self.div_sintetica(orto)
-        logger_cagada.debug("usando div normal {} entre {}".format(self, orto))
-        logger_cagada.debug("dN {} dD {}".format(dN, dD))
+        #logger_cagada.debug("usando div normal {} entre {}".format(self, orto))
+        #logger_cagada.debug("dN {} dD {}".format(dN, dD))
         if dD < 0: raise ZeroDivisionError
         if dN >= dD:
             q = [0] * (dN + 1)
@@ -432,12 +435,12 @@ class poligamio():
                 dividendo_ant = N[:]
                 d = [0] * (dN - dD) + D
                 mult = q[dN - dD] = modular_mod(N[-1] // d[-1])
-                logger_cagada.debug("l mult es {} " .format(mult))
+                #logger_cagada.debug("l mult es {} " .format(mult))
                 d = [modular_mod(modular_mod(coeff) * mult) for coeff in d]
-                logger_cagada.debug("N es {} d es {}" .format(N, d))
+                #logger_cagada.debug("N es {} d es {}" .format(N, d))
                 N = [ modular_mod(coeffN - coeffd) for coeffN, coeffd in zip(N, d)]
                 poligamio.quita_sobrantes_coeficientes(N)
-                logger_cagada.debug("aora N es {}".format(N))
+                #logger_cagada.debug("aora N es {}".format(N))
                 if(N == dividendo_ant):
                     break
                 dN = len(N) - 1
@@ -445,17 +448,17 @@ class poligamio():
         else:
             q = [0]
             r = N
-            logger_cagada.debug("nada q acer r es {}".format(r))
+            #logger_cagada.debug("nada q acer r es {}".format(r))
         poligamio.quita_sobrantes_coeficientes(q)
 #        if(not q):
 #            q=[0]
-        logger_cagada.debug("el q s {} l d {}".format(q, r))
+        #logger_cagada.debug("el q s {} l d {}".format(q, r))
         return poligamio(q, self.base, self.modulo), poligamio(r, self.base, self.modulo)
     
     __rtruediv__ = __truediv__
 
     def div_sintetica(self, orto):
-        # logger_cagada.debug("usando div sintactica {} entre {}".format(self,orto))
+        # #logger_cagada.debug("usando div sintactica {} entre {}".format(self,orto))
         dividendo = self.coeficientes
         divisor = orto.coeficientes
         poligamio.quita_sobrantes_coeficientes(divisor)
@@ -469,15 +472,15 @@ class poligamio():
             while grado_act <= grado_dividendo:
                 grado_contraparte = grado_act + grado_divisor
                 r[grado_act % grado_divisor] += dividendo[grado_act]
-                # logger_cagada.debug("sumando a grado {} {} de {}".format(grado_act % grado_divisor, dividendo[grado_act], grado_act))
+                # #logger_cagada.debug("sumando a grado {} {} de {}".format(grado_act % grado_divisor, dividendo[grado_act], grado_act))
 
                 if(grado_contraparte <= grado_dividendo):
                     r[grado_act % grado_divisor] -= dividendo[grado_contraparte]
-                    # logger_cagada.debug("restando a grado {} {} de {}".format(grado_act % grado_divisor, dividendo[grado_contraparte], grado_contraparte))
+                    # #logger_cagada.debug("restando a grado {} {} de {}".format(grado_act % grado_divisor, dividendo[grado_contraparte], grado_contraparte))
 
                 grado_act += 1
                 if(not (grado_act % grado_divisor)):
-                    # logger_cagada.debug("brincando de grado {} a {}".format(grado_act, grado_divisor + grado_act))
+                    # #logger_cagada.debug("brincando de grado {} a {}".format(grado_act, grado_divisor + grado_act))
                     grado_act += grado_divisor
         else:
             r = dividendo
@@ -505,6 +508,7 @@ class funcionsilla():
         self.polinomio = None
         self.modulo = modulo
         self.base = base
+        assert base is not None
         self.modular_mod = partial(modular, m=modulo)
         self.inicializa(coeficientes, base)
     
@@ -516,18 +520,18 @@ class funcionsilla():
         p = self.polinomio
         raiz_arbolin = self.genera_arbolin_producto(putos)
         evaluaciones = defaultdict(lambda:self.modular_mod(p.coeficientes[0]))
-        logger_cagada.debug("el puto arbol\n{}".format(raiz_arbolin))
-        logger_cagada.debug("putos {}".format(putos))
-        logger_cagada.debug("el pendejo {}".format(p))
+        #logger_cagada.debug("el puto arbol\n{}".format(raiz_arbolin))
+        #logger_cagada.debug("putos {}".format(putos))
+        #logger_cagada.debug("el pendejo {}".format(p))
         self.eval_multicaca_traversea(raiz_arbolin, p, evaluaciones)
-        # logger_cagada.debug("las evaluaciones {}".format(evaluaciones))
+        # #logger_cagada.debug("las evaluaciones {}".format(evaluaciones))
         return evaluaciones
 
     def eval_multicaca_traversea(self, nodo, residuo_ant, evaluaciones):
         if(not nodo.valor.grado):
             return
         _, mierda = residuo_ant / nodo.valor
-        logger_cagada.debug("para l nodo {} grado {} el res ant {} i el res {}".format(nodo.valor, nodo.valor.grado, residuo_ant, mierda))
+        #logger_cagada.debug("para l nodo {} grado {} el res ant {} i el res {}".format(nodo.valor, nodo.valor.grado, residuo_ant, mierda))
         if nodo.valor.grado == 1:
             evaluaciones[-nodo.valor.coeficientes[0]] = mierda
         if nodo.hijo_izq and nodo.hijo_izq.valor.grado:
@@ -550,7 +554,7 @@ class funcionsilla():
         nodo_act = None
         numeros_tam = len(numeros)
         modulo = self.modulo
-        # logger_cagada.debug("los nums {}".format(numeros))
+        # #logger_cagada.debug("los nums {}".format(numeros))
         if(numeros_tam > 1):
             hijo_izq = self.genera_arbolin_product_recursivo(numeros[:numeros_tam // 2])
             hijo_der = self.genera_arbolin_product_recursivo(numeros[numeros_tam // 2:])
@@ -561,11 +565,11 @@ class funcionsilla():
                     nodo_act = nodo_arbol(hijo_izq.valor, hijo_izq, hijo_der)
                 else:
                     nodo_act = nodo_arbol(hijo_izq.valor * hijo_der.valor, hijo_izq, hijo_der)
-            # logger_cagada.debug("el pol {} viene de {} por {}".format(nodo_act.valor, hijo_izq.valor, hijo_der.valor))
+            # #logger_cagada.debug("el pol {} viene de {} por {}".format(nodo_act.valor, hijo_izq.valor, hijo_der.valor))
         else:
             if(numeros[0] != sys.maxsize):
                 nodo_act = nodo_arbol(poligamio([(-numeros[0]), 1], self.base, modulo))
-                # logger_cagada.debug("el pol single {} el num {}".format(nodo_act.valor, numeros[0]))
+                # #logger_cagada.debug("el pol single {} el num {}".format(nodo_act.valor, numeros[0]))
             else:
                 nodo_act = nodo_arbol(poligamio([1], self.base, modulo))
         return nodo_act
@@ -574,7 +578,7 @@ class funcionsilla():
     def genera_polinomio_recursivo(clazz, numeros, base, modulo):
         nodo_act = None
         numeros_tam = len(numeros)
-        # logger_cagada.debug("los nums {}".format(numeros))
+        # #logger_cagada.debug("los nums {}".format(numeros))
         if(numeros_tam > 1):
             hijo_izq = funcionsilla.genera_polinomio_recursivo(numeros[:numeros_tam // 2], base, modulo)
             hijo_der = funcionsilla.genera_polinomio_recursivo(numeros[numeros_tam // 2:], base, modulo)
@@ -585,11 +589,11 @@ class funcionsilla():
                     nodo_act = nodo_arbol(hijo_izq.valor, hijo_izq, hijo_der)
                 else:
                     nodo_act = nodo_arbol(hijo_izq.valor * hijo_der.valor, hijo_izq, hijo_der)
-            # logger_cagada.debug("el pol {} viene de {} por {}".format(nodo_act.valor, hijo_izq.valor, hijo_der.valor))
+            #logger_cagada.debug("el pol {} viene de {} por {}".format(nodo_act.valor, hijo_izq.valor, hijo_der.valor))
         else:
             if(numeros[0] != sys.maxsize):
                 nodo_act = nodo_arbol(poligamio([(numeros[0]), 1], base, modulo))
-                # logger_cagada.debug("el pol single {} el num {}".format(nodo_act.valor, numeros[0]))
+                #logger_cagada.debug("el pol single {} el num {}".format(nodo_act.valor, numeros[0]))
             else:
                 nodo_act = nodo_arbol(poligamio([1], base, modulo))
         return nodo_act
@@ -605,7 +609,7 @@ class funcionsilla():
 def mad_power(a, b, m):
     res = 1
     modular_mod = partial(modular, m=m)
-#    logger_cagada.debug("asdd {}".format([a,b,m]))
+#    #logger_cagada.debug("asdd {}".format([a,b,m]))
     assert a < m
     assert b >= 0
     pot = a
@@ -615,31 +619,31 @@ def mad_power(a, b, m):
             res = modular_mod(res * pot) 
         pot = modular_mod(pot * pot)
         b_tmp >>= 1
-#    logger_cagada.debug("pero q mierda {}".format(res))
+#    #logger_cagada.debug("pero q mierda {}".format(res))
     return res
 
 def mult_con_mod(a, b, m):
     modular_mod = partial(modular, m=m)
-#    logger_cagada.debug("asdd {}".format([a,b,m]))
+#    #logger_cagada.debug("asdd {}".format([a,b,m]))
     res = modular_mod(modular_mod(a) * modular_mod(b)) 
-#    logger_cagada.debug("pero q mierda {}".format(res))
+#    #logger_cagada.debug("pero q mierda {}".format(res))
     return res
 
 def sumar_con_mod(a, b, m):
     modular_mod = partial(modular, m=m)
-#    logger_cagada.debug("asdd {}".format([a,b,m]))
+#    #logger_cagada.debug("asdd {}".format([a,b,m]))
     res = modular_mod(modular_mod(a) + modular_mod(b)) 
-#    logger_cagada.debug("pero q mierda {}".format(res))
+#    #logger_cagada.debug("pero q mierda {}".format(res))
     return res
 
 def cagar_mierda(b, c, d, e, m, k):
-#    logger_cagada.debug("ass {}".format([b, c, d, e, m,k]))
+#    #logger_cagada.debug("ass {}".format([b, c, d, e, m,k]))
     pote = partial(mad_power, m=m)
     suma = partial(sumar_con_mod, m=m)
     multi = partial(mult_con_mod, m=m)
 #    res=sumar_con_mod(sumar_con_mod(mult_con_mod(b,mad_power(c,4*k,m),m),mult_con_mod(d,mad_power(c,2*k,m),m),m),e,m)
     res = suma(suma(multi(b, pote(c, 4 * k)), multi(d, pote(c, 2 * k))), e)
-#    logger_cagada.debug("m corto los webs {}".format(res))
+#    #logger_cagada.debug("m corto los webs {}".format(res))
     return res
     
 
@@ -649,20 +653,21 @@ def pce_genera_putos(n):
 
 def pce_core(n):
     numeros = pce_genera_putos(n)
-    modulo = None
-    base = 10
+    modulo = n
+    base = n
     putos = [0] + list(numeros[:-1])
+    #logger_cagada.debug("los nums {}".format(numeros))
     poli = funcionsilla.genera_polinomio(numeros, base, modulo)
-    logger_cagada.debug("n {} los nums {} los puts {} el pol {}" .format(n, list(numeros), list(putos), poli))
-    funcion_caca = funcionsilla(poli.coeficientes, modulo, modulo)
+    #logger_cagada.debug("n {} los nums {} los puts {} el pol {}" .format(n, list(numeros), list(putos), poli))
+    funcion_caca = funcionsilla(poli.coeficientes, modulo, base)
     evaluaciones = funcion_caca.evalua(putos)
-    logger_cagada.debug("las evals {}".format(evaluaciones))
+    #logger_cagada.debug("las evals {}".format(evaluaciones))
     muti = partial(mult_con_mod, m=modulo)
     bs = map(lambda x:x.coeficientes[0], evaluaciones.values())
     d2 = reduce(muti, bs, 1)
-    logger_cagada.debug("d2 {}".format(d2))
+    #logger_cagada.debug("d2 {}".format(d2))
     t = gcd(n, d2)
-    logger_cagada.debug("t {}".format(t))
+    #logger_cagada.debug("t {}".format(t))
 
 
 def pce_main():

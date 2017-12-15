@@ -680,8 +680,9 @@ def pce_generador_primos(n):
 def pce_core(n):
     if(n<2):
         return n
-    primos=pce_generador_primos(n)
+    n_orig=n
     raiz=n**(0.5)
+    primos=pce_generador_primos(n)
     #logger_cagada.debug("n es {} raoz {}".format(n,raiz))
     while not(n&1) and n:
         n>>=1
@@ -691,7 +692,7 @@ def pce_core(n):
     mayor_factor=0
     for primo in primos:
         #logger_cagada.debug("en primo {} n es {}".format(primo,n))
-        if primo>raiz:
+        if primo>raiz+1:
             break
         while not(n%primo):
             mayor_factor=primo
@@ -699,7 +700,7 @@ def pce_core(n):
         #logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
         if n==1:
             break
-    return mayor_factor if mayor_factor else n
+    return mayor_factor if mayor_factor else n_orig
     
     
 

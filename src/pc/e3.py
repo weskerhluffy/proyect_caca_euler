@@ -700,7 +700,7 @@ def pce_core(n):
         #logger_cagada.debug("despues de primo {} n es {}".format(primo,n))
         if n==1:
             break
-    return mayor_factor if mayor_factor else n_orig
+    return mayor_factor if mayor_factor else n
     
     
 

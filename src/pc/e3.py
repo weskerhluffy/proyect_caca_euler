@@ -7,7 +7,7 @@ Created on 08/10/2017
 # XXX: https://www.hackerrank.com/contests/projecteuler/challenges/euler003
 # XXX: http://web.maths.unsw.edu.au/~davidharvey/talks/factoring.pdf
 
-from math import log, ceil
+from math import log, ceil, sqrt
 import sys
 import logging
 from itertools import zip_longest
@@ -21,7 +21,7 @@ from fractions import gcd
 
 
 nivel_log = logging.ERROR
-nivel_log = logging.DEBUG
+#nivel_log = logging.DEBUG
 #logger_cagada = None
 
 def modular(n, m):
@@ -651,30 +651,60 @@ def pce_genera_putos(n):
     d = ceil(n ** (1 / 4))
     return list(range(1, d + 1))
 
-def pce_core(n):
-    numeros = pce_genera_putos(n)
-    modulo = n
-    base = n
-    putos = [0] + list(numeros[:-1])
-    #logger_cagada.debug("los nums {}".format(numeros))
-    poli = funcionsilla.genera_polinomio(numeros, base, modulo)
-    #logger_cagada.debug("n {} los nums {} los puts {} el pol {}" .format(n, list(numeros), list(putos), poli))
-    funcion_caca = funcionsilla(poli.coeficientes, modulo, base)
-    evaluaciones = funcion_caca.evalua(putos)
-    #logger_cagada.debug("las evals {}".format(evaluaciones))
-    muti = partial(mult_con_mod, m=modulo)
-    bs = map(lambda x:x.coeficientes[0], evaluaciones.values())
-    d2 = reduce(muti, bs, 1)
-    #logger_cagada.debug("d2 {}".format(d2))
-    t = gcd(n, d2)
-    #logger_cagada.debug("t {}".format(t))
 
+def pce_is_prime(number):
+    if number > 1:
+        if number == 2:
+            return True
+        if number % 2 == 0:
+            return False
+        for current in range(3, int(sqrt(number) + 1), 2):
+            if number % current == 0: 
+                return False
+        return True
+    return False
+
+# XXX: http://code.activestate.com/recipes/366178-a-fast-prime-number-list-generator/
+# XXX: https://jeffknupp.com/blog/2013/04/07/improve-your-python-yield-and-generators-explained/
+def pce_generador_primos(n):
+    assert n>=2
+    if n==2:
+        return 2
+    yield 2
+            
+    s=range(3,n+1,2)
+    for num in s:
+        if pce_is_prime(num):
+            yield num
+
+def pce_core(n):
+    if(n<2):
+        return n
+    primos=pce_generador_primos(ceil(n**(0.5))+1)
+    logger_cagada.debug("n es {}".format(n))
+    while not(n&1) and n:
+        n>>=1
+        logger_cagada.debug("shit n es {}".format(n))
+    if (not n):
+        return 2
+    mayor_factor=0
+    for primo in primos:
+        logger_cagada.debug("en primo {} n es {}".format(primo,n))
+        while not(n%primo):
+            mayor_factor=primo
+            n//=primo
+        if n==1:
+            break
+    return mayor_factor if mayor_factor else n
+    
+    
 
 def pce_main():
     t = int(input().strip())
     for a0 in range(t):
         n = int(input().strip())
-        pce_core(n)
+        caca=pce_core(n)
+        print("{}".format(caca))
 
 
 if __name__ == "__main__":

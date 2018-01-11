@@ -8,7 +8,7 @@ import sys
 import logging
 
 nivel_log = logging.ERROR
-nivel_log = logging.DEBUG
+#nivel_log = logging.DEBUG
 logger_cagada = None
 
 class numero_palote():
@@ -23,7 +23,10 @@ class numero_palote():
         
     def _inicializar(self):
         self._init_circulos()
-        self.previo_palo()
+        if not self.son_circulos_palo():
+            self.previo_palo()
+        else:
+            self.digitos_palo=list(map(lambda circ:circ[0], self.circulos))
 
     def _init_circulos(self):
         cadena=list(map(int,self.cadena_num))
@@ -43,9 +46,9 @@ class numero_palote():
 
     def previo_palo(self):
         se_pudo=True
+        circs=self.circulos
         if not self.son_circulos_palo():
             logger_cagada.debug("no era palo")
-            circs=self.circulos
             circs_tam=len(circs)
             idx_circulo_modificado=-1
 
@@ -70,22 +73,44 @@ class numero_palote():
             self.digitos_palo=list(map(lambda circ:circ[0], circs))
         else:
             digis=self.digitos_palo
+            if not digis:
+                digis=self.digitos_palo=list(map(lambda circ:circ[0], circs))
             for idx_digi in range(len(digis)-1,-1,-1):
                 if not idx_digi and digis[idx_digi] ==1:
                     break
                 if digis[idx_digi]:
                     digis[idx_digi]-=1
+                    for i in range(idx_digi+1,len(digis)):
+                        digis[i]=9
                     break
         logger_cagada.debug("el palo es {}".format(self.digitos_palo))
 
+    @property
+    def como_numero(self):
+        return int("".join(map(str,self.digitos_palo+self.digitos_palo[::-1])))
+
+def pce_divisible_entre_centena(num_palo):
+    for divi in range(100,1000):
+        if not (num_palo.como_numero%divi):
+            if 100<=(num_palo.como_numero/divi)<=999:
+                return True
+    return False
+
 def pce_core(numero):
+    logger_cagada.debug("el num es {}".format(numero))
     caca=numero_palote(numero)
+    while not pce_divisible_entre_centena(caca) and caca.como_numero>101101:
+        caca.previo_palo()
+    assert pce_divisible_entre_centena(caca)
+    logger_cagada.debug("la mieda es es {}".format(caca.como_numero))
+    return caca.como_numero
 
 def pce_main():
     t = int(input().strip())
     for a0 in range(t):
         n = input().strip()
-        pce_core(n)
+        ass=pce_core(n)
+        print(ass)
 
 if __name__ == "__main__":
     FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"

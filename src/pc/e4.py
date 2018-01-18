@@ -52,24 +52,38 @@ class numero_palote():
             logger_cagada.debug("no era palo")
             circs_tam=len(circs)
             idx_circulo_modificado=-1
+            idx_circulo_primer_diferente=-1
+            idx_circulo_primer_rebajado=-1
+            idx_circulo_primer_no_cero=-1
 
-            for idx_circ in range(0,circs_tam):
-                if circs[idx_circ][0]!=circs[idx_circ][1]:
-                    idx_circulo_modificado = idx_circ
-            
-            if idx_circulo_modificado!=-1:
-                assert circs[idx_circulo_modificado][0]!=circs[idx_circulo_modificado][1]
-                if circs[idx_circulo_modificado][0]<circs[idx_circulo_modificado][1]:
-                    circs[idx_circulo_modificado][1]=circs[idx_circulo_modificado][0]
-                if circs[idx_circulo_modificado][0]>circs[idx_circulo_modificado][1]:
-                    if not idx_circulo_modificado and circs[idx_circulo_modificado][0]==1:
-                        idx_circulo_modificado+=1
-                        while not circs[idx_circulo_modificado][0] and idx_circulo_modificado<circs_tam:
-                            idx_circulo_modificado+=1
-                    assert idx_circulo_modificado<circs_tam
-                    assert idx_circulo_modificado or circs[idx_circulo_modificado][0]>1
+            for idx_circ in range(circs_tam-1,-1,-1):
+                if circs[idx_circ][0] and idx_circulo_primer_no_cero==-1:
+                    idx_circulo_primer_no_cero= idx_circ
+                if circs[idx_circ][0] != circs[idx_circ][1] and idx_circulo_primer_diferente==-1:
+                    idx_circulo_primer_diferente = idx_circ
+                if circs[idx_circ][0] < circs[idx_circ][1] and idx_circulo_primer_rebajado==-1:
+                    circs[idx_circ][1] = circs[idx_circ][0]
+                    idx_circulo_primer_rebajado = idx_circ
+
+            if idx_circulo_primer_diferente!=-1:
+                if idx_circulo_primer_rebajado!=-1:
+                    if idx_circulo_primer_diferente<=idx_circulo_primer_rebajado:
+                        idx_circulo_modificado = idx_circulo_primer_rebajado
+                    else:
+                        idx_circulo_modificado = idx_circulo_primer_no_cero
+                else:
+                    idx_circulo_modificado = idx_circulo_primer_no_cero
+
+            logger_cagada.debug("zaias {}".format(idx_circulo_modificado))
+            if idx_circulo_modificado!=-1 and not self.son_circulos_palo():
+#                if circs[idx_circulo_modificado][0]<=circs[idx_circulo_modificado][1]:
+#                    circs[idx_circulo_modificado][1]=circs[idx_circulo_modificado][0]
+#                else:
+                assert idx_circulo_modificado or circs[idx_circulo_modificado][0]>1
+                if idx_circulo_modificado!=idx_circulo_primer_rebajado:
                     circs[idx_circulo_modificado][0]-=1
                     circs[idx_circulo_modificado][1]=circs[idx_circulo_modificado][0]
+#                if idx_circulo_primer_diferente>idx_circulo_modificado:
                     for idx_circ in range(idx_circulo_modificado+1,circs_tam):
                         circs[idx_circ][1]=circs[idx_circ][0]=9
                 for idx_circ in range(0,idx_circulo_modificado):

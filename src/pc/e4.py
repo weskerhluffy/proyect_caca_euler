@@ -9,7 +9,7 @@ import logging
 from bisect import bisect_left
 
 nivel_log = logging.ERROR
-nivel_log = logging.DEBUG
+#nivel_log = logging.DEBUG
 logger_cagada = None
 
 class numero_palote():
@@ -171,10 +171,10 @@ def pce_main():
     t = int(input().strip())
     for a0 in range(t):
         n = input().strip()
-#        ass=pce_core(n)
-#        print(ass)
-    for i in range(101102,1000000):
-        ass=pce_core(str(i))
+        ass=pce_core(n)
+        print(ass)
+#    for i in range(101102,1000000):
+#        ass=pce_core(str(i))
 
 if __name__ == "__main__":
     FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"

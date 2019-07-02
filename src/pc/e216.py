@@ -1,10 +1,11 @@
+#!/Library/Frameworks/Python.framework/Versions/3.7/bin/python3
 from array import array
 from math import exp, log, ceil
-from sympy.ntheory import legendre_symbol, is_quad_residue, quadratic_residues
-from gmpy2 import divm, invert, is_prime
 import logging
-from eulerlib.prime_numbers import is_prime
 from sys import maxsize
+#from eulerlib.prime_numbers import is_prime
+#from sympy.ntheory import legendre_symbol, is_quad_residue, quadratic_residues
+#from gmpy2 import divm, invert, is_prime
 
 
 # XXX: https://www.johndcook.com/blog/2008/12/10/solving-linear-congruences/
@@ -13,7 +14,8 @@ from sys import maxsize
 def iterative_egcd(a, b):
 	x, y, u, v = 0, 1, 1, 0
 	while a != 0:
-		q, r = b // a, b % a; m, n = x - u * q, y - v * q  # use x//y for floor "floor division"
+		q, r = b // a, b % a
+		m, n = x - u * q, y - v * q  # use x//y for floor "floor division"
 		b, a, x, y, u, v = a, r, u, v, m, n
 	return b, x, y
 
@@ -144,11 +146,11 @@ def _try_composite(a, d, n, s):
 
 def es_primo(n, _precision_for_huge_n=16):
 	_known_primes = [2, 3]
-#	logger.debug("checando primalidad {}".format(n))
-#	logger.debug("checando primalidad a {}".format(any((not (n % p)) and n != p for p in _known_primes)))
+# 	logger.debug("checando primalidad {}".format(n))
+# 	logger.debug("checando primalidad a {}".format(any((not (n % p)) and n != p for p in _known_primes)))
 	if any((not (n % p)) and n != p for p in _known_primes) or n in (0, 1):
-#		logger.debug("no primoo {} {} {}".format(n, any((not (n % p)) and n != p for p in _known_primes), n in (0, 1)))
-#		logger.debug("no pprimo {}".format(n))
+# 		logger.debug("no primoo {} {} {}".format(n, any((not (n % p)) and n != p for p in _known_primes), n in (0, 1)))
+# 		logger.debug("no pprimo {}".format(n))
 		return False
 	if n in _known_primes:
 		return True
@@ -178,11 +180,11 @@ def es_primo(n, _precision_for_huge_n=16):
 logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(processName)s [%(filename)s:%(lineno)s - %(funcName)20s() ] %(name)s %(message)s')
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-# logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 MAX_PRIMOS = int(1E6)
 MAX_ABCISA = int(1E6)
-qs = QuadraticSieve(MAX_PRIMOS)
 
 a, b, c = [int(x) for x in input().strip().split(" ")]
 logger.debug("a {} b {} c {}".format(a, b, c))
@@ -193,7 +195,17 @@ abcisas_primos_array = array("B")
 ordenadas_array = array("Q")
 abcisas_suma_primos_acumulada = array("I")
 
-for xi in range(MAX_ABCISA + 1):
+Ns = []
+while q:
+	N = int(input())
+	Ns.append(N)
+# 	logger.info("res {}".format(abcisas_suma_primos_acumulada[N]))
+	q -= 1
+
+maxn = max(Ns)
+qs = QuadraticSieve(maxn)
+
+for xi in range(maxn + 1):
 	y = f(xi)
 	primo = None
 	if y > 0:
@@ -222,37 +234,36 @@ for p in qs.primos:
 				x.append(xi)
 	else:
 		ls = qs.simbolo_jacobi(discriminante, p)
-		assert ls == legendre_symbol(discriminante, p), "legendre symbol de {}:{} es incorrecto obtenido {} esperado {}".format(discriminante, p, ls, legendre_symbol(discriminante, p))
+#		assert ls == legendre_symbol(discriminante, p), "legendre symbol de {}:{} es incorrecto obtenido {} esperado {}".format(discriminante, p, ls, legendre_symbol(discriminante, p))
 		logger.debug("legendre {}".format(ls))
 		y = []
 		if ls == -1:
 			continue
-		assert is_quad_residue(discriminante, p) 
+# 		assert is_quad_residue(discriminante, p) 
 		if not discriminante or not ls:
 				y.append(0)
 		else:
-			assert ls == 1
+# 			assert ls == 1
 			y1, y2 = qs.calcula_conguencia_residuo_cuadratico(discriminante, p)
-	# 		assert yt.intersection({y1, y2}) == {y1, y2}, "congruencias erroneas, {},{} no son {}".format(y1, y2, yt)
 			y.extend([y1, y2])
 			logger.debug("ys {}".format(y))
 		
 		# XXX: https://stackoverflow.com/questions/4798654/modular-multiplicative-inverse-function-in-python
 		for yi in y:
-			assert ((yi * yi) % p) == discriminante % p, "fallo sol y {} disc {} p {}".format(yi, discriminante, p)
+# 			assert ((yi * yi) % p) == discriminante % p, "fallo sol y {} disc {} p {}".format(yi, discriminante, p)
 			xi = modinv(a << 1, p) 
-			assert xi and xi == invert(a << 1, p)
+# 			assert xi and xi == invert(a << 1, p)
 			xi *= (yi - b)
-			assert xi and divm(a << 1, yi - b, p)
+# 			assert xi and divm(a << 1, yi - b, p)
 			x.append(xi)
-			assert not (f(xi) % p)
+# 			assert not (f(xi) % p)
 	
 	for xi in x:
 		logger.debug("primer no primo {} com p {}".format(xi, p))
-		for xii in range(xi, MAX_ABCISA + 1, p):
+		for xii in range(xi, maxn + 1, p):
 			yi = ordenadas_array[xii]
 			logger.debug("no es primo x {} y {}".format(xii, yi))
-			assert not yi % p
+# 			assert not yi % p
 			if yi != p:
 				abcisas_primos_array[xii] = False
 				abcisas_set.discard(xii)
@@ -261,20 +272,20 @@ for x in list(abcisas_set):
 	logger.debug("checando primalidad x {} y {}".format(x, y))
 	if not es_primo(y):
 		logger.debug("no primo {}".format(y))
-		assert not is_prime(y)
+# 		assert not is_prime(y)
 		abcisas_set.discard(x)
 		abcisas_primos_array[x] = False
 
-primos_debug = set([x for x in range(MAX_ABCISA + 1) if ordenadas_array[x] > 0 and es_primo(ordenadas_array[x])])
-assert abcisas_set.difference(primos_debug) == set(), "abcisas set {} real {} diff {}".format(abcisas_set, primos_debug, abcisas_set.difference(primos_debug))
+# primos_debug = set([x for x in range(MAX_ABCISA + 1) if ordenadas_array[x] > 0 and es_primo(ordenadas_array[x])])
+# assert abcisas_set.difference(primos_debug) == set(), "abcisas set {} real {} diff {}".format(abcisas_set, primos_debug, abcisas_set.difference(primos_debug))
 
 logger.info("calculados {} primos hasta {}".format(len(abcisas_set), MAX_ABCISA))
 
-for i in range(1, MAX_PRIMOS + 1):
+for i in range(1, maxn + 1):
 	abcisas_suma_primos_acumulada[i] = abcisas_suma_primos_acumulada[i - 1] + (1 if abcisas_primos_array[i] else 0)
 
 logger.info("suma corriente calc")
-while q:
-	N = int(input())
+
+for N in Ns:
 	logger.info("res {}".format(abcisas_suma_primos_acumulada[N]))
-	q -= 1
+	print("{}".format(abcisas_suma_primos_acumulada[N]))

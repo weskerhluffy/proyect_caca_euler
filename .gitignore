@@ -2,3 +2,5 @@
 src/pc/shit
 *out*
 *shame
+.DS_Store
+*.c.log

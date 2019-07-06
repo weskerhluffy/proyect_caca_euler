@@ -116,6 +116,7 @@ class QuadraticSieve():
 		R = (n ** ((Q + 1) >> 1)) % p
 		t = (n ** Q) % p
 		M = S
+		logger.debug("t {} R {}".format(t,R))
 		while (t % p) != 1:
 			i = 0
 			logger.debug("M {}".format(M))
@@ -134,7 +135,6 @@ class QuadraticSieve():
 		return R, p - R
 
 
-# XXX: https://rosettacode.org/wiki/Miller–Rabin_primality_test#Python:_Probably_correct_answers
 def _try_composite(a, d, n, s):
 	if pow(a, d, n) == 1:
 		return False
@@ -180,8 +180,8 @@ def es_primo(n, _precision_for_huge_n=16):
 logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(processName)s [%(filename)s:%(lineno)s - %(funcName)20s() ] %(name)s %(message)s')
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-logger.setLevel(logging.INFO)
-logger.setLevel(logging.ERROR)
+#logger.setLevel(logging.INFO)
+#logger.setLevel(logging.ERROR)
 
 MAX_PRIMOS = int(1E6)
 MAX_ABCISA = int(1E6)
@@ -260,6 +260,10 @@ for p in qs.primos:
 	
 	for xi in x:
 		logger.debug("primer no primo {} com p {}".format(xi, p))
+		if xi<0:
+			fc=abs(xi//p)*p
+			xi+=fc
+			logger.debug("corregido a {} fc {}".format(xi,fc))
 		for xii in range(xi, maxn + 1, p):
 			yi = ordenadas_array[xii]
 			logger.debug("no es primo x {} y {}".format(xii, yi))

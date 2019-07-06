@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&lt; /Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in.txt"
+            argument = "&lt; /Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in1.txt"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
@@ -80,7 +80,7 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "STDIN"
-            value = "/Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in.txt"
+            value = "/Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in12.txt"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

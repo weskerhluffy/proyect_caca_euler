@@ -5,9 +5,9 @@ Created on 6 jul 2019
 '''
 
 if __name__ == '__main__':
-    maxn=int(1E2)
+    maxn=int(1E7)
     q=int(1E1)
-    i=3
+    i=21
     for a in [1,2]:
         for b in [-100,0,100]:
             for c in [-maxn,0,maxn]:

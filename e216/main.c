@@ -127,7 +127,7 @@ COMUN_FUNC_STATICA void comun_current_utc_time(struct timespec *ts) {
     
 }
 
-COMUN_FUNC_STATICA void comun_timestamp(char *stime) {
+COMUN_FUNC_STATICA char *comun_timestamp(char *stime) {
     time_t ltime;
     long ms;
 #ifndef ONLINE_JUDGE
@@ -151,6 +151,7 @@ COMUN_FUNC_STATICA void comun_timestamp(char *stime) {
 #endif
     sprintf(parte_milisecundos, "%ld", ms);
     strcat(stime, parte_milisecundos);
+    return stime;
 }
 
 #endif
@@ -517,6 +518,8 @@ COMUN_FUNC_STATICA natural comun_encuentra_divisores(natural n,
 
 #if 1
 
+#define PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA 4294967296
+
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(entero_largo n,entero_largo m){
     if(n<0){
         n%=m;
@@ -528,28 +531,33 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(ent
     return n;
 }
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_mul_mod(
-                                                             entero_largo a, entero_largo b,
+                                                             entero_largo_sin_signo a, entero_largo_sin_signo b,
                                                              entero_largo_sin_signo c) {
-    entero_largo b_int=b;
-    entero_largo a_int=a;
+    entero_largo_sin_signo b_int=b;
+    entero_largo_sin_signo a_int=a;
+    entero_largo_sin_signo r=0;
     
-    entero_largo x = 0, y = a_int % c;
-    entero_largo r=0;
-    while (b_int != 0) {
-        if (b_int & 1) {
-            x = (x + y) % c;
-        }
-        y = (y << 1) % c;
-        b_int >>= 1;
+    if(a<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA && b<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA){
+        r=(a*b)%c;
     }
-    r=x%c;
+    else{
+        entero_largo_sin_signo x = 0, y = a_int % c;
+        while (b_int != 0) {
+            if (b_int & 1) {
+                x = (x + y) % c;
+            }
+            y = (y << 1) % c;
+            b_int >>= 1;
+        }
+        r=x%c;
+    }
     return r;
 }
 
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
-                                                             entero_largo a, entero_largo_sin_signo p,
+                                                             entero_largo_sin_signo a, entero_largo_sin_signo p,
                                                              entero_largo_sin_signo m) {
-    entero_largo acum_pot=a;
+    entero_largo_sin_signo acum_pot=a;
     entero_largo_sin_signo acum_res=1;
     if (!p) {
         return 1;
@@ -560,13 +568,13 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
         }
         acum_pot=primalidad_mul_mod(acum_pot, acum_pot, m);
     }
-
+    
     /*
-    if (p & 1) {
-        return primalidad_mul_mod(a, primalidad_exp_mod(a, p - 1, m), m);
-    }
-    entero_largo x = primalidad_exp_mod(a, p >> 1, m);
-    return primalidad_mul_mod(x, x, m);
+     if (p & 1) {
+     return primalidad_mul_mod(a, primalidad_exp_mod(a, p - 1, m), m);
+     }
+     entero_largo x = primalidad_exp_mod(a, p >> 1, m);
+     return primalidad_mul_mod(x, x, m);
      */
     return acum_res;
 }
@@ -635,7 +643,7 @@ COMUN_FUNC_STATICA bool primalidad_es_primo(entero_largo_sin_signo n, natural k)
 
 #if 1
 
-#define PRIMOS_NUM_MAX ((int)1E6)
+#define PRIMOS_NUM_MAX ((int)15E6) // sqrt(f(n))
 //#define PRIMOS_NUM_MAX 11
 typedef struct primos_datos {
     natural primos_criba_tam;
@@ -1059,7 +1067,7 @@ COMUN_FUNC_STATICA void shanks_tonelli_conguencia_residuo_cuadratico(entero_larg
 #endif
 
 
-#define E216_MAX_ABCISA ((natural)1E7)
+#define E216_MAX_ABCISA ((natural)15E6)
 //#define E216_MAX_ABCISA 101
 COMUN_FUNC_STATICA entero_largo e216_f(entero_largo a,entero_largo b, entero_largo c, entero_largo x){
     return a*x*x+b*x+c;
@@ -1071,7 +1079,8 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     entero_largo *ordenadas=NULL;
     bool *abcisas_primos=NULL;
     primos_datos *pd = NULL;
-    natural Nmax=comun_max_natural(Ns, q);
+    natural Nmax=ceil(sqrt(e216_f(a, b, c, comun_max_natural(Ns, q))));
+    printf("max abcisa %u\n",Nmax);
     
     pd = calloc(1, sizeof(primos_datos));
     assert_timeout(pd);
@@ -1081,12 +1090,12 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     abcisas_primos=calloc(Nmax+1, sizeof(bool));
     assert_timeout(abcisas_primos);
     
-    
+    printf("primos ini %s\n",comun_timestamp(COMUN_BUF_STATICO)); setbuf(stdout, NULL);
     natural primos_tam=primos_criba_criba(comun_min(Nmax, PRIMOS_NUM_MAX), NULL, NULL, NULL, NULL, NULL, pd);
     comun_log_debug("primos gen");
-//    printf("primos gen\n");
-    
-    for(x=0;x<=Nmax;x++){
+    printf("primos fini %s\n",comun_timestamp(COMUN_BUF_STATICO)); setbuf(stdout, NULL);
+
+    for(x=2;x<=Nmax;x++){
         entero_largo y=e216_f(a, b, c, x);
         bool primo=falso;
         if(y>0){
@@ -1100,7 +1109,9 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         comun_log_debug("guardando y %lld de x %u", y,x);
         abcisas_primos[x]=primo;
     }
-//    printf("abcisas guardads \n");
+    abcisas_primos[0]=primalidad_es_primo(e216_f(a, b, c, 0),5);
+    abcisas_primos[1]=primalidad_es_primo(e216_f(a, b, c, 1),5);
+    //    printf("abcisas guardads \n");
     hashset_itr_t iter = hashset_iterator(abcisas_primos_set);
     
     free(iter);
@@ -1121,11 +1132,12 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         }
     }
     
+    printf("shanks ini %s\n",comun_timestamp(COMUN_BUF_STATICO)); setbuf(stdout, NULL);
     for (natural i = 1; i < primos_tam; i++) {
         natural p = pd->primos_criba[i];
         comun_log_debug("primo %u", p);
-//        printf("primo %u\n", p);
-//        setbuf(stdout, NULL);
+        //        printf("primo %u\n", p);
+        //        setbuf(stdout, NULL);
         entero_largo ys[2]={0};
         natural y_cnt=0;
         entero_largo ls=e216_simbolo_jacobi(discriminante, p);
@@ -1148,8 +1160,9 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
                 x+=fc;
             }
             comun_log_debug("primo %u y %lld x %lld", p,ys[j],x);
-            for(entero_largo xi=x;xi<=Nmax;xi+=p){
+            for(entero_largo xi=x-((x/p)*p);xi<=Nmax;xi+=p){
                 entero_largo yi=ordenadas[xi];
+                comun_log_debug("checando x %llu y %llu", xi,yi);
                 if(yi!=p){
                     comun_log_debug("descartando yi %lld viene de xi %lld", yi,xi);
                     hashset_remove(abcisas_primos_set, (void *)(entero_largo)xi);
@@ -1158,42 +1171,54 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
             }
         }
     }
+    printf("shanks fini %s\n",comun_timestamp(COMUN_BUF_STATICO)); setbuf(stdout, NULL);
     
     comun_log_debug("esho");
-//    printf("esho, faltan %d por checar\n",hashset_num_items(abcisas_primos_set));
-//    setbuf(stdout, NULL);
+    //    printf("esho, faltan %d por checar\n",hashset_num_items(abcisas_primos_set));
+    //    setbuf(stdout, NULL);
     iter = hashset_iterator(abcisas_primos_set);
-
+    
+    /*
     entero_largo *xs_invalidos=calloc(Nmax+1, sizeof(entero_largo));
     assert_timeout(xs_invalidos);
     natural xs_invalidos_cnt=0;
     natural cntt=0;
+    
     while(hashset_iterator_has_next(iter))
     {
         entero_largo x=hashset_iterator_value(iter);
         entero_largo y=ordenadas[x];
         comun_log_debug("checando primalidad de y %lld q viene de x %lld", y,x);
-//        printf("checando primalidad de y %lld q viene de x %lld %u\n", y,x,cntt);
-        setbuf(stdout, NULL);
+        //        printf("checando primalidad de y %lld q viene de x %lld %u\n", y,x,cntt);
+        //        setbuf(stdout, NULL);
         cntt++;
         assert_timeout(y);
         assert_timeout(y!=COMUN_VALOR_INVALIDO);
         if(!primalidad_es_primo(y,5)){
             comun_log_debug("y %lld q viene de x %lld no es primo", y,x);
+            printf("y %lld q viene de x %lld no es primo\n", y,x);
             xs_invalidos[xs_invalidos_cnt++]=x;
+            if(!(xs_invalidos_cnt%100000)){
+                printf("van %u de %u\n",xs_invalidos_cnt,cntt); setbuf(stdout, NULL);
+            }
+        }
+        else{
+            printf("primo encc %llu de %llu\n",y,x); setbuf(stdout, NULL);
         }
         hashset_iterator_next(iter);
     }
-    
+    printf("checados %u no primos %u\n",cntt,xs_invalidos_cnt); setbuf(stdout, NULL);
+
     for(natural i=0;i<xs_invalidos_cnt;i++){
         entero_largo x=xs_invalidos[i];
         hashset_remove(abcisas_primos_set, (void *)(entero_largo)x);
         abcisas_primos[x]=falso;
     }
+     */
     
     for(natural i=1;i<=Nmax;i++){
         conteo_acumulado_primos[i]=conteo_acumulado_primos[i-1]+(abcisas_primos[i]?1:0);
-//        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
+        //        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
         if(abcisas_primos[i]){
             comun_log_debug("%u:%u",i,abcisas_primos[i]);
         }
@@ -1234,7 +1259,7 @@ COMUN_FUNC_STATICA void e126_main(){
         }
     }
 #endif
-
+    
     scanf("%d %d %d\n",&a,&b,&c);
     comun_log_debug("a %d b %d c %d", a,b,c);
     scanf("%u\n",&q);

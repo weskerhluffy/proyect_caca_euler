@@ -181,7 +181,7 @@ logging.basicConfig(format='%(asctime)s  %(levelname)-10s %(processName)s [%(fil
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 #logger.setLevel(logging.INFO)
-#logger.setLevel(logging.ERROR)
+logger.setLevel(logging.ERROR)
 
 MAX_PRIMOS = int(1E6)
 MAX_ABCISA = int(1E6)

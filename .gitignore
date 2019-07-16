@@ -1,6 +1,5 @@
-
-src/pc/shit
-*out*
-*shame
-.DS_Store
+.stack-work/
+proyect-euler.cabal
+*~
+src/.DS_Store
 *.c.log

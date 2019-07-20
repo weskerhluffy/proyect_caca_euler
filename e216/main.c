@@ -69,11 +69,11 @@ typedef enum BOOLEANOS {
     falso = 0, verdadero
 } bool;
 
-#define COMUN_TIPO_ASSERT COMUN_ASSERT_SUAVECITO
 /*
+#define COMUN_TIPO_ASSERT COMUN_ASSERT_SUAVECITO
  #define COMUN_TIPO_ASSERT COMUN_ASSERT_DUROTE
- #define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
  */
+ #define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
 
 #define assert_timeout_dummy(condition) 0;
 
@@ -533,25 +533,7 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(ent
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_mul_mod(
                                                              entero_largo_sin_signo a, entero_largo_sin_signo b,
                                                              entero_largo_sin_signo c) {
-    entero_largo_sin_signo b_int=b;
-    entero_largo_sin_signo a_int=a;
-    entero_largo_sin_signo r=0;
-    
-    if(a<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA && b<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA){
-        r=(a*b)%c;
-    }
-    else{
-        entero_largo_sin_signo x = 0, y = a_int % c;
-        while (b_int) {
-            if (b_int & 1) {
-                x = (x + y) % c;
-            }
-            y = (y << 1) % c;
-            b_int >>= 1;
-        }
-        r=x%c;
-    }
-    return r;
+    return a*b%c;
 }
 
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
@@ -561,9 +543,9 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
     entero_largo_sin_signo acum_res=1;
     while(p){
         if(p&1){
-            acum_res=primalidad_mul_mod(acum_res, acum_pot, m);
+            acum_res=(acum_res* acum_pot)% m;
         }
-        acum_pot=primalidad_mul_mod(acum_pot, acum_pot, m);
+        acum_pot=(acum_pot* acum_pot)% m;
         p>>=1;
     }
     comun_log_debug("pot lenta %llu a la %llu mod %llu es %llu", a,p,m,acum_pot);
@@ -654,6 +636,7 @@ natural idx_primo, natural compuesto, void *cb_ctx);
 typedef void (*primos_criba_no_divisible_encontrado_cb)(natural primo,
 natural idx_primo, natural compuesto, void *cb_ctx);
 
+//#define PRIMOS_CRIBA_USA_CALLBACKS
 COMUN_FUNC_STATICA natural primos_criba_criba(natural limite,
                                               primos_criba_primo_encontrado_cb primo_cb,
                                               primos_criba_compuesto_encontrado_cb compuesto_cb,
@@ -662,6 +645,7 @@ COMUN_FUNC_STATICA natural primos_criba_criba(natural limite,
                                               void *cb_ctx, primos_datos *pd) {
     bool *primos_criba_es_primo = pd->primos_criba_es_primo;
     natural *primos_criba = pd->primos_criba;
+    natural primos_criba_tam=0;
     comun_log_debug("primos asta %u", limite);
     assert_timeout(limite<=PRIMOS_NUM_MAX);
     natural i, j;
@@ -670,31 +654,39 @@ COMUN_FUNC_STATICA natural primos_criba_criba(natural limite,
     }
     for (i = 2; i <= limite; i++) {
         if (primos_criba_es_primo[i]) {
-            primos_criba[pd->primos_criba_tam++] = i;
+            primos_criba[primos_criba_tam++] = i;
+#ifdef PRIMOS_CRIBA_USA_CALLBACKS
             if (primo_cb) {
-                primo_cb(i, pd->primos_criba_tam - 1, cb_ctx);
+                primo_cb(i, primos_criba_tam - 1, cb_ctx);
             }
+#endif
         }
-        for (j = 0; j < pd->primos_criba_tam && primos_criba[j] * i <= limite;
+        for (j = 0; j < primos_criba_tam && primos_criba[j] * i <= limite;
              j++) {
             primos_criba_es_primo[primos_criba[j] * i] = falso;
+#ifdef PRIMOS_CRIBA_USA_CALLBACKS
             if (compuesto_cb) {
                 compuesto_cb(primos_criba[j], j, i, cb_ctx);
             }
+#endif
             if (!(i % primos_criba[j])) {
+#ifdef PRIMOS_CRIBA_USA_CALLBACKS
                 if (divisible_encontrado_cb) {
                     divisible_encontrado_cb(primos_criba[j], j, i, cb_ctx);
                 }
+#endif
                 break;
             } else {
+#ifdef PRIMOS_CRIBA_USA_CALLBACKS
                 if (no_divisible_encontrado_cb) {
                     no_divisible_encontrado_cb(primos_criba[j], j, i, cb_ctx);
                 }
+#endif
             }
         }
     }
-    comun_log_debug("generados %u primos", pd->primos_criba_tam);
-    return pd->primos_criba_tam;
+    comun_log_debug("generados %u primos", primos_criba_tam);
+    return primos_criba_tam;
 }
 
 #endif

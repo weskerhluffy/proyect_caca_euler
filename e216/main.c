@@ -70,10 +70,10 @@ typedef enum BOOLEANOS {
 } bool;
 
 /*
-#define COMUN_TIPO_ASSERT COMUN_ASSERT_SUAVECITO
+ #define COMUN_TIPO_ASSERT COMUN_ASSERT_SUAVECITO
  #define COMUN_TIPO_ASSERT COMUN_ASSERT_DUROTE
  */
- #define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
+#define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
 
 #define assert_timeout_dummy(condition) 0;
 
@@ -693,7 +693,9 @@ COMUN_FUNC_STATICA natural primos_criba_criba(natural limite,
 
 
 #if 1
-COMUN_FUNC_STATICA void e216_algoritmo_euclidiano_extendido(entero_largo a,entero_largo b, entero_largo *gp,entero_largo *xp,entero_largo *yp){
+COMUN_FUNC_STATICA entero_largo e216_algoritmo_euclidiano_extendido(entero_largo a,entero_largo b, entero_largo *xp
+//                                                            ,entero_largo *yp
+                                                            ){
     entero_largo x=0,y=1,u=1,v=0;
     while(a){
         entero_largo q=b/a;
@@ -707,16 +709,17 @@ COMUN_FUNC_STATICA void e216_algoritmo_euclidiano_extendido(entero_largo a,enter
         u=m;
         v=n;
     }
-    *gp=b;
     *xp=x;
-    *yp=y;
+//    *yp=y;
+                                                                return b;
 }
 
 COMUN_FUNC_STATICA natural e216_inverso_multiplicativo_modular(entero_largo a,entero_largo m){
     entero_largo r=0;
-    entero_largo g=0;
-    entero_largo x=0;
-    e216_algoritmo_euclidiano_extendido(a, m, (entero_largo *)&g, &x, comun_calloc_local(entero_largo));
+    entero_largo x;
+    entero_largo g= e216_algoritmo_euclidiano_extendido(a, m,&x
+//                                        , comun_calloc_local(entero_largo)
+                                        );
     if(g==1){
         r=x%m;
         if(r<0){
@@ -729,18 +732,7 @@ COMUN_FUNC_STATICA natural e216_inverso_multiplicativo_modular(entero_largo a,en
 COMUN_FUNC_STATICA entero_largo e216_simbolo_jacobi(entero_largo a, entero_largo n){
     assert_timeout(n&1);
     entero_largo t=1;
-    if (a < 0 || a > n)
-    {
-        a = a % n;
-        if( a < 0)
-        {
-            a = -a;
-            if( n % 4 == 3){
-                t = -t;
-            }
-        }
-    }
-    
+
     while(a){
         while( !(a&1) )
         {
@@ -788,7 +780,6 @@ COMUN_FUNC_STATICA void shanks_tonelli_conguencia_residuo_cuadratico(entero_larg
         p_menos_1>>=1;
         S++;
     }
-    n=primalidad_normalizar_signo_modulo(n, p);
     entero_largo Z=shanks_tonelli_calcula_z(p);
     entero_largo Q=p_menos_1;
     entero_largo c = (entero_largo)primalidad_exp_mod(Z, Q, p);
@@ -879,9 +870,10 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     for (natural i = 1; i < primos_tam; i++) {
         natural p = pd->primos_criba[i];
         comun_log_debug("primo %u", p);
-        entero_largo ys[2]={0};
+        entero_largo ys[2];
         natural y_cnt=0;
-        entero_largo ls=e216_simbolo_jacobi(discriminante, p);
+        entero_largo discriminante_tmp=primalidad_normalizar_signo_modulo(discriminante, p);
+        entero_largo ls=e216_simbolo_jacobi(discriminante_tmp, p);
         comun_log_debug("sim jaco %lld", ls);
         if(ls==-1){
             continue;
@@ -889,21 +881,14 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         if(!discriminante || !ls){
             ys[y_cnt++]=0;
         }else{
-            shanks_tonelli_conguencia_residuo_cuadratico(discriminante, p, ys, ys+1);
+            shanks_tonelli_conguencia_residuo_cuadratico(discriminante_tmp, p, ys, ys+1);
             y_cnt=2;
         }
         for(natural j=0;j<y_cnt;j++){
             entero_largo x=e216_inverso_multiplicativo_modular(a<<1, p);
             assert_timeout(x);
             x*=ys[j]-b;
-            if(x<0){
-                entero_largo fc=(llabs((x+1)/(entero_largo)p)+1)*(entero_largo)p;
-                x+=fc;
-            }
-            if(x>p){
-                entero_largo fc=((x-1)/(entero_largo)p)*(entero_largo)p;
-                x-=fc;
-            }
+            x=primalidad_normalizar_signo_modulo(x, p);
             comun_log_debug("primo %u y %lld x %lld", p,ys[j],x);
             for(entero_largo xi=x;xi<=Nmax;xi+=p){
                 entero_largo yi=ordenadas[xi];
@@ -916,6 +901,7 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         }
     }
     
+    conteo_acumulado_primos[0]=0;
     for(natural i=1;i<=Nmax;i++){
         conteo_acumulado_primos[i]=conteo_acumulado_primos[i-1]+(abcisas_primos[i]?1:0);
         //        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
@@ -929,8 +915,8 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     free(pd);
 }
 
-natural qs[100000]={0};
-natural conteo_acumulado_primos[E216_MAX_ABCISA+1]={0};
+natural qs[100000];
+natural conteo_acumulado_primos[E216_MAX_ABCISA+1];
 COMUN_FUNC_STATICA void e126_main(){
     int a=0;
     int b=0;

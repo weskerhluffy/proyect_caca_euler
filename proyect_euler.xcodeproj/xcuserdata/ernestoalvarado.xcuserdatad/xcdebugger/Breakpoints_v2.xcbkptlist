@@ -11,11 +11,11 @@
             condition = "xi&lt;0"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.98752"
+            timestampString = "585290702.6136169"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "908"
-            endingLineNumber = "908"
+            startingLineNumber = "893"
+            endingLineNumber = "893"
             landmarkName = "e216_core"
             landmarkType = "9">
          </BreakpointContent>
@@ -27,11 +27,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.988499"
+            timestampString = "585290702.6147439"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "909"
-            endingLineNumber = "909"
+            startingLineNumber = "894"
+            endingLineNumber = "894"
             landmarkName = "e216_core"
             landmarkType = "9">
          </BreakpointContent>
@@ -44,11 +44,11 @@
             condition = "x=218527"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.9890341"
+            timestampString = "585290702.615373"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "895"
-            endingLineNumber = "895"
+            startingLineNumber = "887"
+            endingLineNumber = "887"
             landmarkName = "e216_core"
             landmarkType = "9">
          </BreakpointContent>
@@ -60,11 +60,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.989532"
+            timestampString = "585290702.6158921"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "827"
-            endingLineNumber = "827"
+            startingLineNumber = "818"
+            endingLineNumber = "818"
             landmarkName = "e216_core"
             landmarkType = "9">
          </BreakpointContent>
@@ -77,11 +77,11 @@
             condition = "p=53"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.99019"
+            timestampString = "585290702.616506"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "784"
-            endingLineNumber = "784"
+            startingLineNumber = "776"
+            endingLineNumber = "776"
             landmarkName = "shanks_tonelli_conguencia_residuo_cuadratico"
             landmarkType = "9">
          </BreakpointContent>
@@ -94,24 +94,7 @@
             condition = "p=43"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.990875"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "806"
-            endingLineNumber = "806"
-            landmarkName = "shanks_tonelli_conguencia_residuo_cuadratico"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            condition = "p=43"
-            continueAfterRunningActions = "No"
-            filePath = "e216/main.c"
-            timestampString = "585288829.991456"
+            timestampString = "585290702.6170191"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "797"
@@ -128,11 +111,28 @@
             condition = "p=43"
             continueAfterRunningActions = "No"
             filePath = "e216/main.c"
-            timestampString = "585288829.991976"
+            timestampString = "585290702.617497"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "786"
-            endingLineNumber = "786"
+            startingLineNumber = "788"
+            endingLineNumber = "788"
+            landmarkName = "shanks_tonelli_conguencia_residuo_cuadratico"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            condition = "p=43"
+            continueAfterRunningActions = "No"
+            filePath = "e216/main.c"
+            timestampString = "585290702.617982"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "778"
+            endingLineNumber = "778"
             landmarkName = "shanks_tonelli_conguencia_residuo_cuadratico"
             landmarkType = "9">
          </BreakpointContent>

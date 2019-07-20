@@ -559,27 +559,14 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
                                                              entero_largo_sin_signo m) {
     entero_largo_sin_signo acum_pot=a;
     entero_largo_sin_signo acum_res=1;
-    if (!p) {
-        return 1;
-    }
-    double r=powl(a,p);
-    comun_log_debug("a %llu a la p %llu es %f", a,p,r);
-    // XXX: https://stackoverflow.com/questions/1923837/how-to-use-nan-and-inf-in-c
-    if(r==strtod("Inf", NULL) || r>ULLONG_MAX>>11){
-        while(p){
-            if(p&1){
-                acum_res=primalidad_mul_mod(acum_res, acum_pot, m);
-            }
-            acum_pot=primalidad_mul_mod(acum_pot, acum_pot, m);
-            p>>=1;
+    while(p){
+        if(p&1){
+            acum_res=primalidad_mul_mod(acum_res, acum_pot, m);
         }
-        comun_log_debug("pot lenta %llu a la %llu mod %llu es %llu", a,p,m,acum_pot);
+        acum_pot=primalidad_mul_mod(acum_pot, acum_pot, m);
+        p>>=1;
     }
-    else{
-        //        acum_res=((entero_largo_sin_signo)r)%m;
-        acum_res=(entero_largo_sin_signo)r%m;
-        comun_log_debug("r %f mod %llu es %llu", r,m,acum_res);
-    }
+    comun_log_debug("pot lenta %llu a la %llu mod %llu es %llu", a,p,m,acum_pot);
     return acum_res;
 }
 
@@ -795,7 +782,7 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_simbolo_legendre(entero_largo a, 
 }
 COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p){
     entero_largo z=0;
-    for(z=2;z<p;z++){
+    for(z=3;z<p;z+=2){
         if (p-1==shanks_tonelli_simbolo_legendre(z, p)){
             break;
         }

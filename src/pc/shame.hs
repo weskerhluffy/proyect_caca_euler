@@ -22,4 +22,4 @@ solve n = length $ filter id vs
           MV.write vs i False
       return vs
 
-main = print $ solve 999000
+main = print $ solve 50000000

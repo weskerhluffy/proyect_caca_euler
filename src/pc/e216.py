@@ -3,6 +3,7 @@ from array import array
 from math import exp, log, ceil
 import logging
 from sys import maxsize
+import os
 #from eulerlib.prime_numbers import is_prime
 #from sympy.ntheory import legendre_symbol, is_quad_residue, quadratic_residues
 #from gmpy2 import divm, invert, is_prime
@@ -186,9 +187,14 @@ logger.setLevel(logging.ERROR)
 MAX_PRIMOS = int(1E6)
 MAX_ABCISA = int(1E6)
 
-a, b, c = [int(x) for x in input().strip().split(" ")]
+if "STDIN" in os.environ:
+	f = open(os.environ["STDIN"], "r")
+	input_fn=f.readline
+else:
+	input_fn=input
+a, b, c = [int(x) for x in input_fn().strip().split(" ")]
 logger.debug("a {} b {} c {}".format(a, b, c))
-q = int(input())
+q = int(input_fn())
 f = lambda x:a * x * x + b * x + c
 abcisas_set = set()
 abcisas_primos_array = array("B")
@@ -197,7 +203,7 @@ abcisas_suma_primos_acumulada = array("I")
 
 Ns = []
 while q:
-	N = int(input())
+	N = int(input_fn())
 	Ns.append(N)
 # 	logger.info("res {}".format(abcisas_suma_primos_acumulada[N]))
 	q -= 1

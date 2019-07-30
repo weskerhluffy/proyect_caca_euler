@@ -270,6 +270,8 @@ for p in qs.primos:
 			fc=abs(xi//p)*p
 			xi+=fc
 			logger.debug("corregido a {} fc {}".format(xi,fc))
+		if xi>p:
+			xi%=p
 		for xii in range(xi, maxn + 1, p):
 			yi = ordenadas_array[xii]
 			logger.debug("no es primo x {} y {}".format(xii, yi))

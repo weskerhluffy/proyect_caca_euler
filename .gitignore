@@ -5,3 +5,4 @@ src/.DS_Store
 *.c.log
 src/pc/out
 src/pc/out.txt
+src/pc/out1

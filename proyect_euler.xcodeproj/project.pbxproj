@@ -300,7 +300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_CFLAGS = "-DCOMUN_LOG";
+				OTHER_CFLAGS = "-DCOMUN_LOGs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -309,7 +309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_CFLAGS = "-DCOMUN_LOG";
+				OTHER_CFLAGS = "-DCOMUN_LOGs";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

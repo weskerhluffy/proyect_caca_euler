@@ -6,3 +6,4 @@ src/.DS_Store
 src/pc/out
 src/pc/out.txt
 src/pc/out1
+*.swp

@@ -69,10 +69,10 @@ typedef enum BOOLEANOS {
     falso = 0, verdadero
 } bool;
 
- #define COMUN_TIPO_ASSERT COMUN_ASSERT_DUROTE
+#define COMUN_TIPO_ASSERT COMUN_ASSERT_DUROTE
 /*
  #define COMUN_TIPO_ASSERT COMUN_ASSERT_SUAVECITO
-#define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
+ #define COMUN_TIPO_ASSERT COMUN_ASSERT_NIMADRES
  */
 
 #define assert_timeout_dummy(condition) 0;
@@ -565,9 +565,8 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_exp_mod(
     while(p){
         if(p&1){
             acum_res=primalidad_mul_mod(acum_res, a, m);
-//            acum_res=(acum_res*a)%m;
         }
-        a=(a* a) %m;
+        a=primalidad_mul_mod(a, a, m);
         p>>=1;
     }
     comun_log_debug("pot lenta %llu a la %llu mod %llu es %llu", a,p,m,acum_res);
@@ -791,9 +790,9 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p){
     entero_largo_sin_signo p_menos_1=p-1;
     entero_largo_sin_signo p_menos_1_entre_2=p_menos_1>>1;
     for(z=3;z<p;z+=2){
-//        if (p-1==shanks_tonelli_simbolo_legendre(z, p)){
+        //        if (p-1==shanks_tonelli_simbolo_legendre(z, p)){
         if (p_menos_1==primalidad_exp_mod(z, p_menos_1_entre_2, p)){
-//        if (p_menos_1==shanks_tonelli_simbolo_legendre(z, p)){
+            //        if (p_menos_1==shanks_tonelli_simbolo_legendre(z, p)){
             break;
         }
     }
@@ -823,10 +822,10 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_conguencia_residuo_cuadratico(ent
         comun_log_debug("pot %lld", 1<<(M-i-1));
         entero_largo b=(entero_largo)primalidad_exp_mod(c, 1ULL << (M - i - 1), p);
         comun_log_debug("b %lld R %lld t %lld c %lld M %lld i %lld",b, R, t, c, M, i);
-//        R=primalidad_mul_mod(R, b, p);
+        //        R=primalidad_mul_mod(R, b, p);
         R=(R* b)% p;
         c=primalidad_exp_mod(b, 2, p);
-//        t=primalidad_mul_mod(t, c, p);
+        //        t=primalidad_mul_mod(t, c, p);
         t=(t* c)% p;
         M=i;
     }
@@ -857,19 +856,16 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     abcisas_primos=calloc(abcisa_max+1, sizeof(bool));
     assert_timeout(abcisas_primos);
     
+    // XXX: https://stackoverflow.com/questions/822323/how-to-generate-a-random-int-in-c
+    srand((natural)time(NULL));
     natural primos_tam=primos_criba_criba(comun_min(Nmax, PRIMOS_NUM_MAX), NULL, NULL, NULL, NULL, NULL, pd);
     comun_log_debug("primos gen");
     
     for(x=0;x<=abcisa_max;x++){
         entero_largo y=e216_f(a, b, c, x);
         bool primo=falso;
-        if(y>0){
-            if(x<2){
-                primo=primalidad_es_primo(e216_f(a, b, c, x),5);
-            }
-            else{
-                primo=verdadero;
-            }
+        if(y>1){
+            primo=verdadero;
         }else{
             y=COMUN_VALOR_INVALIDO;
             primo=falso;
@@ -886,7 +882,8 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         entero_largo y=e216_f(a, b, c, x);
         natural p=2;
         if(!(y&1)){
-            for(entero_largo xi=x;xi<=Nmax;xi+=p){
+            // XXX: https://medium.com/@xcadaverx/locating-the-source-of-a-memory-leak-712667bf8cd5
+            for(entero_largo xi=x;xi<=abcisa_max;xi+=p){
                 entero_largo yi=ordenadas[xi];
                 if(yi!=p){
                     abcisas_primos[xi]=falso;
@@ -938,11 +935,16 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         conteo_acumulado_primos[i]=conteo_acumulado_primos[i-1]+(abcisas_primos[i]?1:0);
         //        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
         /*
-        if(abcisas_primos[i]){
-            comun_log_debug("%u:%u:%u",i,ordenadas[i],abcisas_primos[i]);
-        }
+         if(abcisas_primos[i]){
+         comun_log_debug("%u:%u:%u",i,ordenadas[i],abcisas_primos[i]);
+         }
          */
-        assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
+        if(ordenadas[i]!=COMUN_VALOR_INVALIDO){
+            assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
+        }
+        else{
+            assert_timeout(!abcisas_primos[i]);
+        }
     }
     
     free(ordenadas);

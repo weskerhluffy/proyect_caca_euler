@@ -938,13 +938,13 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
          if(abcisas_primos[i]){
          comun_log_debug("%u:%u:%u",i,ordenadas[i],abcisas_primos[i]);
          }
-         */
         if(ordenadas[i]!=COMUN_VALOR_INVALIDO){
             assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
         }
         else{
             assert_timeout(!abcisas_primos[i]);
         }
+         */
     }
     
     free(ordenadas);

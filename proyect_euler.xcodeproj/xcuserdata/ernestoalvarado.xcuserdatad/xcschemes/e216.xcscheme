@@ -80,7 +80,7 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "STDIN"
-            value = "/Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in21.txt"
+            value = "/Users/ernestoalvarado/eworkspace/proyect_euler/src/pc/in00.txt"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

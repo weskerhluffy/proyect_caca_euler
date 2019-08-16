@@ -520,6 +520,16 @@ COMUN_FUNC_STATICA natural comun_encuentra_divisores(natural n,
 
 #define PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA 4294967296
 
+COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_a_minimo(entero_largo n,entero_largo min, entero_largo m){
+    /*
+    if(n!=min){
+        entero_largo dif=n-min;
+        entero_largo fac=dif/llabs(dif);
+        n+=(((dif-fac)/m)+((dif&0x8000000000000000)>>63))*m;
+    }
+     */
+    return ((min-(!!min))/m)*m+(m+(n%m))%m;
+}
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(entero_largo n,entero_largo m){
     if(n<0){
         n%=m;
@@ -530,25 +540,23 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(ent
     }
     return n;
 }
-#if 1
+#if 0
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_mul_mod(
                                                              entero_largo_sin_signo a, entero_largo_sin_signo b,
                                                              entero_largo_sin_signo c) {
-    entero_largo_sin_signo b_int=b;
-    entero_largo_sin_signo a_int=a;
-    entero_largo_sin_signo r=0;
+    entero_largo_sin_signo r;
     
     if(a<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA && b<=PRIMALIDAD_LIMITE_MULTIPLICACION_NATIVA){
         r=(a*b)%c;
     }
     else{
-        entero_largo_sin_signo x = 0, y = a_int % c;
-        while (b_int) {
-            if (b_int & 1) {
+        entero_largo_sin_signo x = 0, y = a% c;
+        while (b) {
+            if (b& 1) {
                 x = (x + y) % c;
             }
             y = (y << 1) % c;
-            b_int >>= 1;
+            b>>= 1;
         }
         r=x%c;
     }
@@ -785,6 +793,7 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_simbolo_legendre(entero_largo a, 
     entero_largo r=(entero_largo)primalidad_exp_mod(a, ((p - 1) >> 1), p);
     return r;
 }
+entero_largo zmax=0;
 COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p){
     entero_largo z;
     entero_largo_sin_signo p_menos_1=p-1;
@@ -796,6 +805,11 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p){
             break;
         }
     }
+    /*
+    if(z>zmax){
+        zmax=z;
+    }
+     */
     return z;
 }
 COMUN_FUNC_STATICA entero_largo shanks_tonelli_conguencia_residuo_cuadratico(entero_largo n,entero_largo p){
@@ -847,6 +861,7 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     primos_datos *pd = NULL;
     natural abcisa_max= comun_max_natural(Ns, q);
     natural Nmax=ceil(sqrt(e216_f(a, b, c,abcisa_max)))+1;
+    natural primero_positivo=COMUN_VALOR_INVALIDO;
     
     pd = calloc(1, sizeof(primos_datos));
     assert_timeout(pd);
@@ -859,13 +874,16 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     // XXX: https://stackoverflow.com/questions/822323/how-to-generate-a-random-int-in-c
     srand((natural)time(NULL));
     natural primos_tam=primos_criba_criba(comun_min(Nmax, PRIMOS_NUM_MAX), NULL, NULL, NULL, NULL, NULL, pd);
-    comun_log_debug("primos gen");
-    
+
     for(x=0;x<=abcisa_max;x++){
         entero_largo y=e216_f(a, b, c, x);
         bool primo=falso;
         if(y>1){
             primo=verdadero;
+            if(primero_positivo==COMUN_VALOR_INVALIDO){
+                primero_positivo=x;
+                comun_log_debug("primero posi %llu", primero_positivo);
+            }
         }else{
             y=COMUN_VALOR_INVALIDO;
             primo=falso;
@@ -874,7 +892,7 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         comun_log_debug("guardando y %lld de x %u", y,x);
         abcisas_primos[x]=primo;
     }
-    
+
     entero_largo discriminante=(entero_largo)b*(entero_largo)b-(entero_largo)4*(entero_largo)a*(entero_largo)c;
     comun_log_debug("discr %lld", discriminante);
     
@@ -898,7 +916,7 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
         comun_log_debug("primo %u", p);
         entero_largo y1;
         entero_largo y2;
-        entero_largo discriminante_tmp=primalidad_normalizar_signo_modulo(discriminante, p);
+        entero_largo discriminante_tmp=primalidad_normalizar_signo_modulo(discriminante,p);
         entero_largo ls=e216_simbolo_jacobi(discriminante_tmp, p);
         comun_log_debug("sim jaco %lld", ls);
         if(ls==-1){
@@ -912,16 +930,16 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
             y2=p-y1;
         }
         entero_largo x=e216_inverso_multiplicativo_modular(a2, p);
-        for(entero_largo xi=primalidad_normalizar_signo_modulo(x*(y1-b), p);xi<=abcisa_max;xi+=p){
-            comun_log_debug("checando x %llu y %llu", xi,y1);
+        for(entero_largo xi=primalidad_normalizar_a_minimo(x*(y1-b),(entero_largo)primero_positivo, p);xi<=abcisa_max;xi+=p){
+            comun_log_debug("checando x %lld primero pos %lld y %lld", xi,(entero_largo)primero_positivo,y1);
             if(ordenadas[xi]!=p){
                 comun_log_debug("descartando yi %lld viene de xi %lld", ordenadas[xi],xi);
                 abcisas_primos[xi]=falso;
             }
         }
         if(y2!=COMUN_VALOR_INVALIDO){
-            for(entero_largo xi=primalidad_normalizar_signo_modulo(x*(y2-b), p);xi<=abcisa_max;xi+=p){
-                comun_log_debug("checando x %llu y %llu", xi,y2);
+            for(entero_largo xi=primalidad_normalizar_a_minimo(x*(y2-b),(entero_largo)primero_positivo, p);xi<=abcisa_max;xi+=p){
+                comun_log_debug("checando x %llu primero pos %llu y %llu", xi,(entero_largo)primero_positivo,y2);
                 if(ordenadas[xi]!=p){
                     comun_log_debug("descartando yi %lld viene de xi %lld", ordenadas[xi],xi);
                     abcisas_primos[xi]=falso;
@@ -938,12 +956,12 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
          if(abcisas_primos[i]){
          comun_log_debug("%u:%u:%u",i,ordenadas[i],abcisas_primos[i]);
          }
-        if(ordenadas[i]!=COMUN_VALOR_INVALIDO){
-            assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
-        }
-        else{
-            assert_timeout(!abcisas_primos[i]);
-        }
+         if(ordenadas[i]!=COMUN_VALOR_INVALIDO){
+         assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
+         }
+         else{
+         assert_timeout(!abcisas_primos[i]);
+         }
          */
     }
     
@@ -992,6 +1010,7 @@ COMUN_FUNC_STATICA void e126_main(){
     for(natural i=0;i<q;i++){
         printf("%u\n",conteo_acumulado_primos[qs[i]]);
     }
+//    printf("zmax %llu\n",zmax);
 }
 
 int main(void){

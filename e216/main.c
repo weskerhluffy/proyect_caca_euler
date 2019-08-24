@@ -540,7 +540,7 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_normalizar_signo_modulo(ent
     }
     return n;
 }
-#if 0
+#if 1
 COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_mul_mod(
                                                              entero_largo_sin_signo a, entero_largo_sin_signo b,
                                                              entero_largo_sin_signo c) {
@@ -599,15 +599,12 @@ COMUN_FUNC_STATICA entero_largo_sin_signo primalidad_rand_intervalo(
 COMUN_FUNC_STATICA bool primalidad_prueba_miller_rabbit(
                                                         entero_largo_sin_signo n) {
     entero_largo_sin_signo a = primalidad_rand_intervalo(2, n - 2);
-    //    comun_log_debug("rand a %llu inter %llu-%llu", a, 2, n-2);
     entero_largo_sin_signo d = n - 1;
-    while (!(d & 1)) {
+    while (!(d & 1LL)) {
         d >>= 1;
     }
-    //    comun_log_debug("d %llu", d);
     entero_largo_sin_signo x = primalidad_exp_mod(a, d, n);
-    //    comun_log_debug("x %llu", x);
-    
+
     if (x == 1 || x == (n - 1)) {
         return verdadero;
     }
@@ -715,6 +712,7 @@ COMUN_FUNC_STATICA natural primos_criba_criba(natural limite,
         }
     }
     comun_log_debug("generados %u primos", primos_criba_tam);
+    pd->primos_criba_tam=primos_criba_tam;
     return primos_criba_tam;
 }
 
@@ -794,32 +792,35 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_simbolo_legendre(entero_largo a, 
     return r;
 }
 entero_largo zmax=0;
-COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p){
-    entero_largo z;
-    entero_largo_sin_signo p_menos_1=p-1;
-    entero_largo_sin_signo p_menos_1_entre_2=p_menos_1>>1;
-    for(z=3;z<p;z+=2){
-        //        if (p-1==shanks_tonelli_simbolo_legendre(z, p)){
-        if (p_menos_1==primalidad_exp_mod(z, p_menos_1_entre_2, p)){
-            //        if (p_menos_1==shanks_tonelli_simbolo_legendre(z, p)){
+COMUN_FUNC_STATICA entero_largo shanks_tonelli_calcula_z(entero_largo p, primos_datos *pd){
+    entero_largo z=0;
+    entero_largo p_menos_1_entre_2=(p-1)>>1;
+    for(natural i=1;i<pd->primos_criba_tam && z<70;i++){
+        z=pd->primos_criba[i];
+        entero_largo z_menos_1=z-1;
+        entero_largo z_menos_1_entre_2=z_menos_1>>1;
+        entero_largo p_res_cuad_z;
+        if(primalidad_exp_mod(p, z_menos_1_entre_2, z)==z_menos_1){
+            p_res_cuad_z=-1;
+        }
+        else{
+            p_res_cuad_z=1;
+        }
+        entero_largo signo=((p_menos_1_entre_2*z_menos_1_entre_2)&1LL)?-1:1;
+        if(signo*p_res_cuad_z==-1){
             break;
         }
     }
-    /*
-    if(z>zmax){
-        zmax=z;
-    }
-     */
     return z;
 }
-COMUN_FUNC_STATICA entero_largo shanks_tonelli_conguencia_residuo_cuadratico(entero_largo n,entero_largo p){
+COMUN_FUNC_STATICA entero_largo shanks_tonelli_conguencia_residuo_cuadratico(entero_largo n,entero_largo p,primos_datos *pd){
     entero_largo p_menos_1=p-1;
     entero_largo S=0;
     while(!(p_menos_1&1)){
         p_menos_1>>=1;
         S++;
     }
-    entero_largo Z=shanks_tonelli_calcula_z(p);
+    entero_largo Z=shanks_tonelli_calcula_z(p,pd);
     entero_largo Q=p_menos_1;
     entero_largo c = (entero_largo)primalidad_exp_mod(Z, Q, p);
     entero_largo R = (entero_largo)primalidad_exp_mod(n,(entero_largo_sin_signo)((Q + 1) >> 1) , p);
@@ -846,6 +847,30 @@ COMUN_FUNC_STATICA entero_largo shanks_tonelli_conguencia_residuo_cuadratico(ent
     return R;
 }
 #endif
+
+// XXX: https://www.rookieslab.com/posts/fastest-way-to-check-if-a-number-is-prime-or-not
+bool is_prime(entero_largo_sin_signo n) {
+    // Assumes that n is a positive natural number
+    // We know 1 is not a prime number
+    if (n <2 && !(n&1)) {
+        return falso;
+    }
+    
+    entero_largo_sin_signo i = 3;
+    // This will loop from 2 to int(sqrt(x))
+    while (i*i <= n) {
+        // Check if i divides x without leaving a remainder
+        if (n % i == 0) {
+            // This means that n has a factor in between 2 and sqrt(n)
+            // So it is not a prime number
+            return falso;
+        }
+        i += 1;
+    }
+    // If we did not find any factor in the above loop,
+    // then n is a prime number
+    return verdadero;
+}
 
 
 #define E216_MAX_ABCISA ((natural)1E8)
@@ -926,7 +951,7 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
             y1=0;
             y2=COMUN_VALOR_INVALIDO;
         }else{
-            y1=shanks_tonelli_conguencia_residuo_cuadratico(discriminante_tmp, p);
+            y1=shanks_tonelli_conguencia_residuo_cuadratico(discriminante_tmp, p,pd);
             y2=p-y1;
         }
         entero_largo x=e216_inverso_multiplicativo_modular(a2, p);
@@ -951,13 +976,14 @@ COMUN_FUNC_STATICA void e216_core(natural a, int b, int c, natural *Ns,natural q
     conteo_acumulado_primos[0]=0;
     for(natural i=1;i<=abcisa_max;i++){
         conteo_acumulado_primos[i]=conteo_acumulado_primos[i-1]+(abcisas_primos[i]?1:0);
-        //        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
         /*
+        //        comun_log_debug("hasta %u hay %u", i,conteo_acumulado_primos[i]);
          if(abcisas_primos[i]){
          comun_log_debug("%u:%u:%u",i,ordenadas[i],abcisas_primos[i]);
          }
          if(ordenadas[i]!=COMUN_VALOR_INVALIDO){
-         assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],5));
+//         assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],10) || abcisas_primos[i]==is_prime(ordenadas[i]));
+             assert_timeout(abcisas_primos[i]==primalidad_es_primo(ordenadas[i],10) );
          }
          else{
          assert_timeout(!abcisas_primos[i]);

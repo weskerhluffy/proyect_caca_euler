@@ -96,7 +96,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "823"
             endingLineNumber = "823"
-            landmarkName = "shanks_tonelli_conguencia_residuo_cuadratico"
+            landmarkName = "shanks_tonelli_calcula_z"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

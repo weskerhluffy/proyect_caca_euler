@@ -5,6 +5,18 @@
 //  Created by ernesto alvarado on 21/06/19.
 //  Copyright © 2019 ernesto alvarado. All rights reserved.
 //
+// XXX: https://brilliant.org/wiki/legendre-symbol/
+// XXX: https://golem.ph.utexas.edu/category/2007/06/quadratic_reciprocity.html
+// XXX: http://math.gordon.edu/ntic/ntic/section-quadratic-reciprocity.html
+// XXX: https://math.stackexchange.com/questions/2205520/is-the-law-of-quadratic-reciprocity-necessary-or-just-convenient-for-calculation
+// XXX: https://math.stackexchange.com/questions/447468/fast-legendre-symbol-calculation
+// XXX: https://translate.google.com/#view=home&op=translate&sl=pt&tl=en&text=https%3A%2F%2Froosephu.github.io%2F2013%2F09%2F23%2FPE-437%2F
+// XXX: http://mathonline.wikidot.com/the-quadratic-reciprocity-theorem
+// XXX: http://mathworld.wolfram.com/QuadraticReciprocityTheorem.html
+// XXX: https://math.stackexchange.com/questions/551700/when-is-the-quadratic-congruence-ax2-bx-c-equiv-0-pmod-p-solvable
+// XXX: https://rosettacode.org/wiki/Tonelli-Shanks_algorithm#Python
+// XXX: https://euler.stephan-brumme.com/216/
+// XXX: https://howlingpixel.com/i-en/Tonelli–Shanks_algorithm
 #if 1
 #define _GNU_SOURCE
 #include <stdio.h>

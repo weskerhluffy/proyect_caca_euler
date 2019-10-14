@@ -14,6 +14,12 @@
 //  Copyright © 2019 ernesto alvarado. All rights reserved.
 //
 
+// XXX: https://cp-algorithms.com/algebra/phi-function.html
+// XXX: https://roosephu.github.io/2013/09/23/PE-437/
+// XXX: https://www.johannesbader.ch/2013/09/project-euler-problem-437-fibonacci-primitive-roots/
+// XXX: https://www.fq.math.ca/Scanned/10-2/shanks-a.pdf
+// XXX: https://sahandsaba.com/fibonacci-primitive-roots-project-euler.html
+
 #if 1
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -764,7 +770,7 @@ primalidad_es_primo (entero_largo_sin_signo n, natural k)
 #if 1
 
 #define PRIMOS_NUM_MAX ((int)1E8)
-//#define PRIMOS_NUM_MAX 11
+//#define PRIMOS_NUM_MAX 10000
 typedef struct primos_datos
 {
     natural primos_criba_tam;
@@ -1050,14 +1056,12 @@ COMUN_FUNC_STATICA natural e437_encuentra_factores_primos(entero_largo a, primos
     return factores_primos_tam;
 }
 
+entero_largo factores_primos[MAX_NUM]={0};
 COMUN_FUNC_STATICA bool e437_es_raiz_primitiva(entero_largo a,entero_largo p,primos_datos *pd){
     entero_largo p_menos_1=p-1;
-    entero_largo *factores_primos=NULL;
-    factores_primos=calloc(10000, sizeof(entero_largo));
-    assert_timeout(factores_primos);
-    
-    natural factores_primos_tam=e437_encuentra_factores_primos(a, pd, factores_primos);
-    
+
+    natural factores_primos_tam=e437_encuentra_factores_primos(p_menos_1, pd, factores_primos);
+
     for(natural i=0;i<factores_primos_tam;i++){
         entero_largo fp=factores_primos[i];
         if(primalidad_exp_mod(a, p_menos_1/fp, p)==1){
@@ -1065,7 +1069,6 @@ COMUN_FUNC_STATICA bool e437_es_raiz_primitiva(entero_largo a,entero_largo p,pri
         }
     }
     
-    free(factores_primos);
     return verdadero;
 }
 
@@ -1079,6 +1082,7 @@ COMUN_FUNC_STATICA bool e437_es_raiz_primitiva_fibonacci(entero_largo p, primos_
         entero_largo raiz_potencial_2=primalidad_mul_mod(primalidad_normalizar_signo_modulo(1-raiz_5,p), dos_inv, p);
 
         if(e437_es_raiz_primitiva(raiz_potencial_1, p, pd)|| e437_es_raiz_primitiva(raiz_potencial_2, p, pd)){
+            assert_timeout((primalidad_exp_mod(raiz_potencial_1, 2, p)==(raiz_potencial_1+1)) ||(primalidad_exp_mod(raiz_potencial_2, 2, p)==(raiz_potencial_2+1)));
             return verdadero;
         }
     }
@@ -1093,14 +1097,16 @@ e437_main ()
     assert_timeout(pd);
     natural primos_tam=primos_criba_init(MAX_NUM, NULL, NULL, NULL, NULL, NULL, pd);
     entero_largo r=0;
+    natural r_cnt=0;
     
     for(natural i=3;i<primos_tam;i++){
         entero_largo p=pd->primos_criba[i];
         if(e437_es_raiz_primitiva_fibonacci(p, pd)){
             r+=p;
+            r_cnt++;
         }
     }
-    printf("%lld\n",r);
+    printf("%lld\n",r+5);
 }
 
 

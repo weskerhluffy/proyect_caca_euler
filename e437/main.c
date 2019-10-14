@@ -12,7 +12,6 @@
 //
 //  Created by ernesto alvarado on 28/08/19.
 //  Copyright © 2019 ernesto alvarado. All rights reserved.
-//
 
 // XXX: https://cp-algorithms.com/algebra/phi-function.html
 // XXX: https://roosephu.github.io/2013/09/23/PE-437/
